@@ -43,10 +43,10 @@ layout (binding = 2) uniform UBO
 
 void main()
 {
-		// LOOK: This is very similar to a CUDA kernel.
-		// Right now, the compute shader only advects the particles with their
-		// velocity and handles wrap-around.
-		// TODO: implement flocking behavior.
+	// LOOK: This is very similar to a CUDA kernel.
+	// Right now, the compute shader only advects the particles with their
+	// velocity and handles wrap-around.
+	// TODO: implement flocking behavior.
 
     // Current SSBO index
     uint index = gl_GlobalInvocationID.x;
@@ -54,21 +54,57 @@ void main()
     if (index >= ubo.particleCount)
 		return;
 
+	vec2 v1 = vec2(0.0, 0.0);
+	vec2 v2 = vec2(0.0, 0.0);
+	vec2 v3 = vec2(0.0, 0.0);
+	int ctr1 = 0.0, ctr3 = 0.0;
     // Read position and velocity
-		vec2 vPos = particlesA[index].pos.xy;
+	vec2 vPos = particlesA[index].pos.xy;
     vec2 vVel = particlesA[index].vel.xy;
 
-		// clamp velocity for a more pleasing simulation.
-		vVel = normalize(vVel) * clamp(length(vVel), 0.0, 0.1);
+	for (int i = 0; i < ubo.particleCount; ++i) {
+		float dist = distance(vPos, particlesA[i].pos.xy);
+		if (i != index) {
+			// Rule 1: boids fly towards their local perceived center of mass, which excludes themselves
+			if (dist < ubo.rule1Distance) {
+				v1 += particlesA[i].pos.xy;
+				ctr1 += 1.0;
+			}
+			// Rule 2: boids try to stay a distance d away from each other
+			if (dist < ubo.rule2Distance) {
+				v2 -= (particlesA[i].pos.xy - vPos);
+			}
+			// Rule 3: boids try to match the speed of surrounding boids
+			if (dist < ubo.rule3Distance) {
+				v3 += particlesA[i].vel.xy;
+				ctr3 += 1.f;
+			}
+		}
+	}
+	if(ctr1 > 0){
+		v1 = v1 / ctr1;
+		v1 = (v1 - vPos) * ubo.rule1Scale;
+	}
+	
+		v2 = v2 * ubo.rule2Scale;
+	
+	if(ctr3 > 0)
+		v3 = v3 / ctr3;
+	v3 = (v3) * ubo.rule3Scale;
 
-		// kinematic update
-		vPos += vVel * ubo.deltaT;
+	vVel += v1 + v2 + v3;
+
+	// clamp velocity for a more pleasing simulation.
+	vVel = normalize(vVel) * clamp(length(vVel), 0.0, 0.1);
+
+	// kinematic update
+	vPos += vVel * ubo.deltaT;
 
     // Wrap around boundary
-		if (vPos.x < -1.0) vPos.x = 1.0;
-		if (vPos.x > 1.0) vPos.x = -1.0;
-		if (vPos.y < -1.0) vPos.y = 1.0;
-		if (vPos.y > 1.0) vPos.y = -1.0;
+	if (vPos.x < -1.0) vPos.x = 1.0;
+	if (vPos.x > 1.0) vPos.x = -1.0;
+	if (vPos.y < -1.0) vPos.y = 1.0;
+	if (vPos.y > 1.0) vPos.y = -1.0;
 
     particlesB[index].pos.xy = vPos;
 
