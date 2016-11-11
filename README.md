@@ -1,16 +1,26 @@
 Vulkan Flocking: compute and shading in one pipeline!
 ======================
+[CLICK ME FOR INSTRUCTION OF THIS PROJECT](./INSTRUCTION.md)
 
 **University of Pennsylvania, CIS 565: GPU Programming and Architecture, Project 6**
 
-* (TODO) YOUR NAME HERE
-  Windows 22, i7-2222 @ 2.22GHz 22GB, GTX 222 222MB (Moore 2222 Lab)
+* Akshay Shah
+* Tested on: Windows 10, i7-5700HQ @ 2.70GHz 16GB, GTX 970M 6GB (Personal Computer)
 
-  ### (TODO: Your README)
+### Vulkan Boids flocking simulation
 
-  Include screenshots, analysis, etc. (Remember, this is public, so don't put
-  anything here that you don't want to share with the world.)
+Screenshots
+-----------
+
+  ![](img/boids.gif)
+
+Bloopers
+--------
+
+![](img/boids_bug.gif)
 
 ### Credits
 
 * [Vulkan examples and demos](https://github.com/SaschaWillems/Vulkan) by [@SaschaWillems](https://github.com/SaschaWillems)
+* [Conrad Parker's notes](http://www.vergenet.net/~conrad/boids/pseudocode.html)
+* [2D implementation in Processing](http://studio.sketchpad.cc/sp/pad/view/ro.9cbgCRcgbPOI6/rev.23?)
